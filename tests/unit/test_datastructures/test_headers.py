@@ -331,7 +331,7 @@ def test_etag_no_value() -> None:
 
 def test_etag_non_ascii() -> None:
     with pytest.raises(ValueError):
-        ETag(value="fâ†“o")
+        ETag(value="f↓o")
 
 
 def test_etag_from_header() -> None:
@@ -347,7 +347,7 @@ def test_etag_from_header_weak(value: str) -> None:
     assert etag.weak is True
 
 
-@pytest.mark.parametrize("value", ['"fÃ¸o"', 'W/"fÃ¸o"'])
+@pytest.mark.parametrize("value", ['"føo"', 'W/"føo"'])
 def test_etag_from_header_non_ascii_value(value: str) -> None:
     with pytest.raises(ImproperlyConfiguredException):
         ETag.from_header(value)
