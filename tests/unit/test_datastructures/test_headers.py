@@ -207,6 +207,13 @@ def test_mutable_scope_headers_setitem_existing_key(
     assert raw_headers == [(b"foo", b"baz")]
 
 
+def test_mutable_scope_headers_replace_interleaved_duplicates() -> None:
+    raw_headers = [(b"foo", b"1"), (b"bar", b"2"), (b"foo", b"3"), (b"foo", b"4")]
+    headers = MutableScopeHeaders({"headers": raw_headers})
+    headers["Foo"] = "new"
+    assert raw_headers == [(b"foo", b"new"), (b"bar", b"2")]
+
+
 def test_mutable_scope_headers_from_tuple_setitem_existing_key(
     raw_headers_tuple: "RawHeaders", mutable_headers_from_tuple: MutableScopeHeaders, existing_headers_key: str
 ) -> None:
@@ -324,7 +331,7 @@ def test_etag_no_value() -> None:
 
 def test_etag_non_ascii() -> None:
     with pytest.raises(ValueError):
-        ETag(value="f↓o")
+        ETag(value="fâ†“o")
 
 
 def test_etag_from_header() -> None:
@@ -340,7 +347,7 @@ def test_etag_from_header_weak(value: str) -> None:
     assert etag.weak is True
 
 
-@pytest.mark.parametrize("value", ['"føo"', 'W/"føo"'])
+@pytest.mark.parametrize("value", ['"fÃ¸o"', 'W/"fÃ¸o"'])
 def test_etag_from_header_non_ascii_value(value: str) -> None:
     with pytest.raises(ImproperlyConfiguredException):
         ETag.from_header(value)
